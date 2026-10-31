@@ -29,10 +29,10 @@ jobs:
         run: |
           npm install -g cordova
           
-          if [ -f "index html" ]; then mv "index html" index.html; fi
-          
+          # Initialize Cordova app folder
           cordova create build_app com.techrolim.raulcoder "RaulCoder"
           
+          # Clear default template and copy web files
           rm -rf build_app/www/*
           cp -r index.html css js assets build_app/www/ 2>/dev/null || cp index.html build_app/www/
           cp config.xml build_app/config.xml
@@ -40,6 +40,7 @@ jobs:
           cd build_app
           cordova platform add android@latest
           
+          # Build using internal Gradle wrapper
           cd platforms/android
           chmod +x gradlew
           ./gradlew assembleDebug
