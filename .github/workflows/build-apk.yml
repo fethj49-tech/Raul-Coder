@@ -32,16 +32,20 @@ jobs:
           # Fix filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
-          # Create fresh Cordova project
+          # Create fresh Cordova app wrapper
           cordova create build_app com.techrolim.raulcoder "RaulCoder"
           
-          # Copy web code into Cordova www root
+          # Copy your web assets into Cordova www directory
           rm -rf build_app/www/*
           cp -r index.html css js assets build_app/www/ 2>/dev/null || cp index.html build_app/www/
           
           cd build_app
-          cordova platform add android@12.0.0
-          cordova build android --verbose
+          cordova platform add android@latest
+          
+          # Build using project's Gradle wrapper instead of system Gradle 9.x
+          cd platforms/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
