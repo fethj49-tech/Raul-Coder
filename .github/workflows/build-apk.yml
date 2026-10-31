@@ -17,7 +17,7 @@ jobs:
       - name: Set up Java JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Setup Node.js
@@ -32,10 +32,10 @@ jobs:
           # Fix filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
-          # Create fresh Cordova app wrapper
+          # Create fresh Cordova project
           cordova create build_app com.techrolim.raulcoder "RaulCoder"
           
-          # Inject your web code into Cordova www directory
+          # Copy web code into Cordova www root
           rm -rf build_app/www/*
           cp -r index.html css js assets build_app/www/ 2>/dev/null || cp index.html build_app/www/
           
