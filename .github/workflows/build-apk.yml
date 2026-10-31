@@ -25,39 +25,26 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build Webview Android App
+      - name: Build APK with Cordova
         run: |
-          # Generate minimal package.json
-          npm init -y
+          npm install -g cordova
           
-          # Standardize HTML filename if space exists
+          # Fix filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
-          # Create web directory structure
-          mkdir -p www
-          cp -r index.html css js assets www/ 2>/dev/null || cp index.html www/
+          # Create fresh Cordova app wrapper
+          cordova create build_app com.techrolim.raulcoder "RaulCoder"
           
-          # Install dependencies and configure Capacitor
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          # Inject your web code into Cordova www directory
+          rm -rf build_app/www/*
+          cp -r index.html css js assets build_app/www/ 2>/dev/null || cp index.html build_app/www/
           
-          cat << 'CEOF' > capacitor.config.json
-          {
-            "appId": "com.techrolim.raulcoder",
-            "appName": "Raul Coder",
-            "webDir": "www"
-          }
-          CEOF
-
-          # Add Android platform and assemble APK
-          npx cap add android
-          npx cap sync android
-          
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          cd build_app
+          cordova platform add android@12.0.0
+          cordova build android --verbose
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: RaulCoder-Debug-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: build_app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
