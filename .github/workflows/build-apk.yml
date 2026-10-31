@@ -27,20 +27,19 @@ jobs:
 
       - name: Build Webview Android App
         run: |
-          # Initialize minimal package.json
+          # Generate minimal package.json
           npm init -y
           
-          # Fix filename if space exists
+          # Standardize HTML filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
-          # Create web root folder
+          # Create web directory structure
           mkdir -p www
           cp -r index.html css js assets www/ 2>/dev/null || cp index.html www/
           
-          # Install dependencies and setup Capacitor
+          # Install dependencies and configure Capacitor
           npm install @capacitor/core @capacitor/cli @capacitor/android
           
-          # Create configuration file
           cat << 'CEOF' > capacitor.config.json
           {
             "appId": "com.techrolim.raulcoder",
@@ -49,7 +48,7 @@ jobs:
           }
           CEOF
 
-          # Add Android platform and build APK
+          # Add Android platform and assemble APK
           npx cap add android
           npx cap sync android
           
