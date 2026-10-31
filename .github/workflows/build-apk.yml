@@ -1,0 +1,49 @@
+name: Build Standalone APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build Webview Android App
+        run: |
+          npx create-capacitor-app --name "Raul Coder" --appid "com.techrolim.raulcoder" --npm-client npm
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap add android
+          
+          if [ -f "index html" ]; then mv "index html" index.html; fi
+          
+          mkdir -p www
+          cp -r index.html css js assets www/ 2>/dev/null || cp index.html www/
+          
+          npx cap sync android
+          
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RaulCoder-Debug-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
