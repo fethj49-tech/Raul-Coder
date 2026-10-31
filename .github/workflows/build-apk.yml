@@ -33,7 +33,7 @@ jobs:
           # Fix filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
-          # Create web root
+          # Create web root folder
           mkdir -p www
           cp -r index.html css js assets www/ 2>/dev/null || cp index.html www/
           
@@ -49,7 +49,7 @@ jobs:
           }
           CEOF
 
-          # Add Android platform and build
+          # Add Android platform and build APK
           npx cap add android
           npx cap sync android
           
