@@ -15,27 +15,40 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Build Webview Android App
         run: |
-          npx create-capacitor-app --name "Raul Coder" --appid "com.techrolim.raulcoder" --npm-client npm
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap add android
+          npm install -g @capacitor/cli @capacitor/core
           
+          # Fix filename if space exists
           if [ -f "index html" ]; then mv "index html" index.html; fi
           
+          # Initialize web structure
           mkdir -p www
           cp -r index.html css js assets www/ 2>/dev/null || cp index.html www/
           
+          # Create capacitor config
+          cat << 'CEOF' > capacitor.config.json
+          {
+            "appId": "com.techrolim.raulcoder",
+            "appName": "Raul Coder",
+            "webDir": "www",
+            "bundledWebRuntime": false
+          }
+          CEOF
+
+          # Add Android platform non-interactively
+          npm install @capacitor/android
+          npx cap add android
           npx cap sync android
           
           cd android
